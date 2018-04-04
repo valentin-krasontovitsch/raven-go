@@ -11,3 +11,9 @@ event/error logging system.
 ```text
 go get github.com/getsentry/raven-go
 ```
+
+## Modifications
+
+To use system certificates in stead of the Mozilla certificates provided by
+[go-certify](github.com/certifi/gocertifi), set the environment variable
+`USE_OS_CERTIFICATES` to a non-empty string.

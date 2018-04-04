@@ -314,14 +314,23 @@ var MaxQueueBuffer = 100
 
 func newTransport() Transport {
 	t := &HTTPTransport{}
-	rootCAs, err := gocertifi.CACerts()
-	if err != nil {
-		log.Println("raven: failed to load root TLS certificates:", err)
+	useSystemCertificates := os.Getenv("USE_OS_CERTIFICATES")
+	if useSystemCertificates == "" {
+		rootCAs, err := gocertifi.CACerts()
+		if err != nil {
+			log.Println("raven: failed to load root TLS certificates:", err)
+		} else {
+			t.Client = &http.Client{
+				Transport: &http.Transport{
+					Proxy:           http.ProxyFromEnvironment,
+					TLSClientConfig: &tls.Config{RootCAs: rootCAs},
+				},
+			}
+		}
 	} else {
 		t.Client = &http.Client{
 			Transport: &http.Transport{
-				Proxy:           http.ProxyFromEnvironment,
-				TLSClientConfig: &tls.Config{RootCAs: rootCAs},
+				Proxy: http.ProxyFromEnvironment,
 			},
 		}
 	}
